@@ -5,8 +5,7 @@ module.exports = {
   chainWebpack: config => {
     // 添加别名
     config.resolve.alias
-      .set('@', resolve('src'))
-      .set('api', resolve('src/api'))
-      .set('common', resolve('src/common'))
+      .set('vue$', 'vue/dist/vue.esm.js')
+      .set('com', resolve('src/common'))
   }
 }

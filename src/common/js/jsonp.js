@@ -1,24 +1,30 @@
-import originJsonp from 'jsonp'
+import originJSONP from 'jsonp'
 
-export default function jsonp(url, data, option) {
-  url += (url.indexOf('?') < 0 ? '?' : '&') + param(data)
+export default function musicJssonp (url, data, opts) {
+  // eslint-disable-next-line promise/param-names
+  url += (url.indexOf('?') < 0 ? '?' : '$') + formateParam(data)
 
-  return new Promise((resolve, reject) => {
-    originJsonp(url, option, (err, data) => {
+  // eslint-disable-next-line promise/param-names
+  return new Promise((res, rej) => {
+    originJSONP(url, opts, (err, data) => {
       if (!err) {
-        resolve(data)
+        res(data)
       } else {
-        reject(err)
+        rej(err)
       }
     })
   })
 }
 
-export function param(data) {
-  let url = ''
-  for (var k in data) {
-    let value = data[k] !== undefined ? data[k] : ''
-    url += '&' + k + '=' + encodeURIComponent(value)
+function formateParam (data) {
+  let queryStr = ''
+  if (data !== undefined) {
+    for (var k in data) {
+      let value = data[k]
+      queryStr += `&${k}=${encodeURIComponent(value)}`
+    }
+    console.log(queryStr)
+    return queryStr ? queryStr.substring(1) : ''
+    console.log(queryStr)
   }
-  return url ? url.substring(1) : ''
 }
