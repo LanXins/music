@@ -5,7 +5,6 @@ export function addClass (el, className) {
   let newClass = el.className.split(' ')
   newClass.push(className)
   el.className = newClass.join(' ')
-  console.log('00')
 }
 
 export function hasClass (el, className) {

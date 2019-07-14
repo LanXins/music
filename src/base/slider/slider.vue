@@ -3,19 +3,25 @@
    <div class="slider-group" ref="sliderGroup">
      <slot></slot>
    </div>
-   <div class="dots"></div>
+   <div class="dots">
+     <span v-for="(item, i) in dots"
+     class="dot"
+     :key="item"
+     :class="{active: currentPsageIndex === i}"
+    ></span>
+   </div>
  </div>
 </template>
 
 <script>
 import BScroll from 'better-scroll'
 import { setTimeout } from 'timers'
-import addClass from '../../common/js/dom'
+import {addClass} from '../../common/js/dom'
 export default {
-  name: '',
   data () {
     return {
-      msg: ''
+      dots: [],
+      currentPsageIndex: 0
     }
   },
   props: {
@@ -35,24 +41,69 @@ export default {
   mounted () {
     setTimeout(() => {
       this._setSliderWidth()
+      this._initSlider()
+      this._initDots()
+      if(this.autoPlay){
+        this._play()
+      }
     }, 20)
   },
   methods: {
     _setSliderWidth () {
-      let children = this.$refs.sliderGroup.children
+      this.children = this.$refs.sliderGroup.children
+
+      console.log(this.children.length)
       let width = 0
       let sliderWidth = this.$refs.slider.clientWidth
-      for (let i = 0; i < children.length; i++) {
-        let child = children[i]
+      for (let i = 0; i < this.children.length; i++) {
+        let child = this.children[i]
         addClass(child, 'slider-item')
         child.style.width = sliderWidth + 'px'
         width += sliderWidth
       }
       if (this.loop) {
-        width += 2 * sliderWidth
+        // width += 2 * sliderWidth
       }
       this.$refs.sliderGroup.style.width = width + 'px'
+    },
+    _initSlider () {
+      this.slider = new BScroll(this.$refs.slider, {
+        scrollX: true,
+        scrollY: false,
+        momentum: false,
+        snap: true,
+        snaploop: this.loop,
+        snapThreshold: 0.3,
+        snapSpeed: 400
+      }),
+      this.slider.on('scrollEnd', () => {
+        let pageIndex = this.slider.getCurrentPage().pageX
+        if(this.loop) {
+          // pageIndex -= 1
+        }
+        this.currentPsageIndex = pageIndex
+
+        if(this.autoPlay) {
+          clearTimeout(this.timer)
+          this._play()
+        }
+      })
+      
+    },
+    _initDots() {
+      this.dots = new Array(this.children.length)
+    },
+
+    _play(){
+      let pageIndex = this.currentPsageIndex + 1
+      if(this.loop) {
+        pageIndex += 1
+      }
+      this.timer = setTimeout( () => {
+        this.slider.goToPage( pageIndex, 0 , 400)
+      }, this.interval)
     }
+
   }
 
 }
